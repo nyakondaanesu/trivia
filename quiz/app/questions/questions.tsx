@@ -48,7 +48,7 @@ export default function DocsPage() {
 
   return (
     <div className="flex-col flex items-center justify-center">
-      <div className="rounded-full bg-paper ">
+      <div className="rounded-full  ">
         <p className="text-xl font-bold p-3">{timeLeft}</p>
       </div>
       {data.length > 0 && <Card props={data} />}
