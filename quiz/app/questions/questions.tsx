@@ -8,35 +8,35 @@ export default function DocsPage() {
   const [data, setData] = useState([]);
   const [timeLeft, setTimeLeft] = useState(90);
   const [hasStarted, setHasStarted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const category = searchParams.get("category") || "23";
   const amount = searchParams.get("amount") || "20";
   const difficulty = searchParams.get("difficulty") || "easy";
 
   const fetchData = async () => {
     try {
+      setIsLoading(true);
       const response = await fetch(
         `/api/trivia?category=${category}&amount=${amount}&difficulty=${difficulty}`
       );
       const trivia = await response.json();
-      setData(trivia); // Set the fetched data into state
-      console.log(trivia);
-      console.log(`${category}, ${amount} , ${difficulty}`);
+      setData(trivia);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching trivia:", error);
+      setIsLoading(false);
     }
   };
+
   useEffect(() => {
     fetchData();
-    console.log(data);
   }, [category, amount, difficulty]);
 
   useEffect(() => {
-    if (!hasStarted || timeLeft <= 0) return; // Stop when the timer reaches zero
-
+    if (!hasStarted || timeLeft <= 0) return;
     const timer = setInterval(() => {
-      setTimeLeft((prev) => Math.max(0, prev - 1)); // Ensure it never goes below 0
+      setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
-
     return () => clearInterval(timer);
   }, [timeLeft, hasStarted]);
 
@@ -48,10 +48,16 @@ export default function DocsPage() {
 
   return (
     <div className="flex-col flex items-center justify-center">
-      <div className="rounded-full  ">
+      <div className="rounded-full">
         <p className="text-xl font-bold p-3">{timeLeft}</p>
       </div>
-      {data.length > 0 && <Card props={data} />}
+      {isLoading ? (
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      ) : (
+        data.length > 0 && <Card props={data} />
+      )}
     </div>
   );
 }
